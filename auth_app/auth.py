@@ -46,7 +46,7 @@ def login_post():
     password: str = request.form['password']
 
     user = get_db().execute('SELECT * FROM user WHERE email = ?',
-                      (email,)).fetchone()
+                            (email,)).fetchone()
     if user is None or not check_password_hash(user['password'], password):
         flash('Please check your login details and try again.')
         return redirect(url_for('auth.login'))
