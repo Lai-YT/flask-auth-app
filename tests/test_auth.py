@@ -9,7 +9,8 @@ from flask import session
 from auth_app.db import get_db
 
 if TYPE_CHECKING:
-    from flask.testing import FlaskClient, TestResponse
+    from flask.testing import FlaskClient
+    from werkzeug.test import TestResponse
 
 
 @dataclass
