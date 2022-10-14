@@ -30,7 +30,10 @@ class TestRegister:
             client.post('/register', data=asdict(user_data))
 
             user: sqlite3.Row = get_db().execute(
-                'SELECT email, name, password FROM user WHERE email = ?', (user_data.email,)).fetchone()
+                'SELECT email, name FROM user WHERE email = ?', (user_data.email,)).fetchone()
+
+            assert user['email'] == user_data.email
+            assert user['name'] == user_data.name
 
     @staticmethod
     def test_should_redirect_to_login_if_succeeded(client: FlaskClient, user_data: RegistrationData) -> None:
