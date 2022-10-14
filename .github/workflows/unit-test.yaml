@@ -1,4 +1,4 @@
-name: Unit tests on auth app
+name: Unit tests
 on: [push, pull_request]
 
 jobs:
