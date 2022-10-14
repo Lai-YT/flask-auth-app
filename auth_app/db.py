@@ -10,12 +10,13 @@ if TYPE_CHECKING:
 
 
 def init_app(app: Flask) -> None:
-    app.cli.add_command(init_ab_command)
+    """Call this function on the created apps to have the database work correctly."""
+    app.cli.add_command(init_db_command)
     app.teardown_appcontext(close_db)
 
 
 @click.command('init-db')
-def init_ab_command() -> None:
+def init_db_command() -> None:
     init_db()
     click.echo('Initialized the database.')
 
