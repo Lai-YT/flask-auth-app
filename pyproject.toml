@@ -3,3 +3,10 @@ max_line_length = 100
 in-place = true
 recursive = true
 aggressive = 3
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov auth_app --cov-branch --cov-report term-missing"
+testpaths = [
+    "tests",
+]
