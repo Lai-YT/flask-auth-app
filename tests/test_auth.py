@@ -25,7 +25,9 @@ class TestRegister:
         return RegistrationData(email='123@email.com', name='123', password='123pwd')
 
     @staticmethod
-    def test_should_add_record_to_database(client: FlaskClient, user_data: RegistrationData) -> None:
+    def test_should_add_record_to_database(
+            client: FlaskClient,
+            user_data: RegistrationData) -> None:
         with client:
             client.post('/register', data=asdict(user_data))
 
@@ -36,14 +38,16 @@ class TestRegister:
             assert user['name'] == user_data.name
 
     @staticmethod
-    def test_should_redirect_to_login_if_succeeded(client: FlaskClient, user_data: RegistrationData) -> None:
+    def test_should_redirect_to_login_if_succeeded(
+            client: FlaskClient, user_data: RegistrationData) -> None:
         response: TestResponse = client.post(
             '/register', data=asdict(user_data))
 
         assert response.location == '/login'
 
     @staticmethod
-    def test_should_stay_in_register_if_email_has_already_been_used(client: FlaskClient, user_data: RegistrationData) -> None:
+    def test_should_stay_in_register_if_email_has_already_been_used(
+            client: FlaskClient, user_data: RegistrationData) -> None:
         client.post('/register', data=asdict(user_data))
 
         response: TestResponse = client.post(
