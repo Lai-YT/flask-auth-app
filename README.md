@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/Lai-YT/flask-auth-app/branch/master/graph/badge.svg?token=K2O39C28JT)](https://codecov.io/gh/Lai-YT/flask-auth-app)
+
 # Login & Registration with Flask
 
 The *templates* and the structure of this application is derived from [Anthony Herbert, "How To Add Authentication to Your App with Flask-Login", DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login).
