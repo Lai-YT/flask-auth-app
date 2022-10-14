@@ -23,6 +23,9 @@ def register():
 
 @bp.route('/register', methods=['POST'])
 def register_post():
+    """Redirects to the login page if registrated successfully;
+    otherwise keeps in the registration page.
+    """
     email: str = request.form['email']
     name: str = request.form['name']
     password: str = request.form['password']
@@ -42,6 +45,9 @@ def register_post():
 
 @bp.route('/login', methods=['POST'])
 def login_post():
+    """Redirects to the profile page if logged in successfully;
+    otherwise keeps in the login page.
+    """
     email: str = request.form['email']
     password: str = request.form['password']
 
