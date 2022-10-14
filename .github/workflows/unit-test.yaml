@@ -14,6 +14,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest
-    - name: Unit tests with Pytest
-      run: python -m pytest
+    - name: Run tests and collect coverage
+      run: python -m pytest --cov=./ --cov-report=xml
+    - name: Upload coverage reports to Codecov with GitHub Action
+      uses: codecov/codecov-action@v3
