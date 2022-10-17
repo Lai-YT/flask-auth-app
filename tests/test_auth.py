@@ -22,7 +22,7 @@ class TestRegister:
         return User(email='123@email.com', name='123', password='123pwd')
 
     @staticmethod
-    def test_register_should_render_register_html(app: Flask) -> None:
+    def test_should_render_register_html(app: Flask) -> None:
         with captured_templates(app) as templates:
 
             response: TestResponse = app.test_client().get('/register')
@@ -70,7 +70,7 @@ class TestLogin:
         assert response.location == '/profile'
 
     @staticmethod
-    def test_login_should_render_login_html(app: Flask) -> None:
+    def test_should_render_login_html(app: Flask) -> None:
         with captured_templates(app) as templates:
 
             response: TestResponse = app.test_client().get('/login')
@@ -120,7 +120,7 @@ class TestLogout:
             assert 'user_name' not in session
 
     @staticmethod
-    def test_logout_should_render_index_html(app: Flask) -> None:
+    def test_should_render_index_html(app: Flask) -> None:
         with captured_templates(app) as templates:
             # login required
             client: FlaskClient = app.test_client()
