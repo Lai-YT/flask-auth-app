@@ -158,8 +158,8 @@ class TestLogout:
     def test_should_be_login_required(client: FlaskClient) -> None:
         response: TestResponse = client.get('/logout')
 
-        assert response.location == '/login'
         assert response.status_code == HTTPStatus.FOUND
+        assert response.location == '/login'
 
     @staticmethod
     def test_should_clear_session(client: FlaskClient) -> None:
