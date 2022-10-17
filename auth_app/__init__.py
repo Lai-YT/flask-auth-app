@@ -1,10 +1,11 @@
-import os
 from secrets import token_hex
 from typing import Mapping, Optional
 
 from flask import Flask
 
-from auth_app import db
+from auth_app import auth, main
+from auth_app.db import db
+from auth_app.models import create_db_command
 
 
 def create_app(test_config: Optional[Mapping] = None) -> Flask:
@@ -12,7 +13,8 @@ def create_app(test_config: Optional[Mapping] = None) -> Flask:
 
     app.config.from_mapping(
         SECRET_KEY=token_hex(),
-        DATABASE=os.path.join(app.instance_path, 'db.sqlite'),
+        SQLALCHEMY_DATABASE_URI='sqlite:///db.sqlite',
+        SQLALCHEMY_ECHO=True,
     )
 
     if test_config is None:
@@ -21,9 +23,7 @@ def create_app(test_config: Optional[Mapping] = None) -> Flask:
         app.config.from_mapping(test_config)
 
     db.init_app(app)
-
-    from auth_app import auth, main
-
+    app.cli.add_command(create_db_command)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
 

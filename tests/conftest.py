@@ -1,13 +1,12 @@
 from __future__ import annotations
-import os
-import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Generator
 
 import pytest
 
 from auth_app import create_app
-from auth_app.db import get_db, init_db
+from auth_app.db import db
+from auth_app.models import create_db
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -18,21 +17,17 @@ data_sql: str = (Path(__file__).parent / 'data.sql').read_text('utf-8')
 
 @pytest.fixture
 def app() -> Generator[Flask, None, None]:
-    db_fd, db_path = tempfile.mkstemp()
-
     app: Flask = create_app({
         'TESTING': True,
-        'DATABASE': db_path,
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
+        'SQLALCHEMY_ECHO': False,
     })
-
     with app.app_context():
-        init_db()
-        get_db().executescript(data_sql)
+        create_db()
+        db.session.execute(db.text(data_sql))
+        db.session.commit()
 
     yield app
-
-    os.close(db_fd)
-    os.unlink(db_path)
 
 
 @pytest.fixture
