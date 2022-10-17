@@ -46,6 +46,7 @@ class TestRegister:
     @staticmethod
     def test_should_redirect_to_login_if_succeeded(client: FlaskClient, user_data: User) -> None:
         response: TestResponse = client.post('/register', data=user_data.__dict__)
+
         assert response.location == '/login'
 
     @staticmethod

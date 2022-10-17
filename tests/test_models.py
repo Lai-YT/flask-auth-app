@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 def test_create_db_command(app: Flask, runner: FlaskCliRunner) -> None:
     with app.app_context():
+
         result: Result = runner.invoke(args=('create-db',))
 
     assert result.exit_code == 0
