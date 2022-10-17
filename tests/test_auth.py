@@ -35,11 +35,11 @@ class TestRegister:
     @staticmethod
     def test_should_add_record_to_database(client: FlaskClient, user_data: User) -> None:
         with client:
+
             client.post('/register', data=user_data.__dict__)
 
             stmt: Select = db.select(User).where(User.email == user_data.email)
             user: User = db.session.execute(stmt).scalars().first()
-
             assert user.email == user_data.email
             assert user.name == user_data.name
 
@@ -112,7 +112,10 @@ class TestLogin:
         with captured_flash_messages(app) as messages:
 
             response: TestResponse = app.test_client().post(
-                '/login', data={'email': 'test@email.com', 'password': 'should_be_test'})
+                '/login',
+                data={
+                    'email': 'test@email.com',
+                    'password': 'should_be_test'})
 
             assert response.status_code == HTTPStatus.FOUND
             assert len(messages) == 1
@@ -123,8 +126,12 @@ class TestLogin:
     @staticmethod
     def test_should_flash_message_if_unregistered_user(app: Flask) -> None:
         with captured_flash_messages(app) as messages:
+
             response: TestResponse = app.test_client().post(
-                '/login', data={'email': 'someone@email.com', 'password': 'someone'})
+                '/login',
+                data={
+                    'email': 'someone@email.com',
+                    'password': 'someone'})
 
             assert response.status_code == HTTPStatus.FOUND
             assert len(messages) == 1
@@ -135,7 +142,12 @@ class TestLogin:
     @staticmethod
     def test_should_add_user_id_and_name_into_session(client: FlaskClient) -> None:
         with client:
-            client.post('/login', data={'email': 'test@email.com', 'password': 'test'})
+
+            client.post(
+                '/login',
+                data={
+                    'email': 'test@email.com',
+                    'password': 'test'})
 
             stmt: Select = db.select(User.id).where(User.email == 'test@email.com')
             user_id: int = db.session.execute(stmt).scalars().first()
