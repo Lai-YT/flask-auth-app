@@ -1,4 +1,5 @@
 from __future__ import annotations
+from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 import pytest
@@ -7,8 +8,10 @@ from sqlalchemy import Select
 
 from auth_app.db import db
 from auth_app.models import User
+from util import captured_templates
 
 if TYPE_CHECKING:
+    from flask import Flask
     from flask.testing import FlaskClient
     from werkzeug.test import TestResponse
 
@@ -17,6 +20,17 @@ class TestRegister:
     @pytest.fixture
     def user_data(self) -> User:
         return User(email='123@email.com', name='123', password='123pwd')
+
+    @staticmethod
+    def test_register_should_render_register_html(app: Flask) -> None:
+        with captured_templates(app) as templates:
+
+            response: TestResponse = app.test_client().get('/register')
+
+            assert response.status_code == HTTPStatus.OK
+            assert len(templates) == 1
+            (template, _), = templates
+            assert template.name == 'register.html'
 
     @staticmethod
     def test_should_add_record_to_database(client: FlaskClient, user_data: User) -> None:
@@ -56,6 +70,17 @@ class TestLogin:
         assert response.location == '/profile'
 
     @staticmethod
+    def test_login_should_render_login_html(app: Flask) -> None:
+        with captured_templates(app) as templates:
+
+            response: TestResponse = app.test_client().get('/login')
+
+            assert response.status_code == HTTPStatus.OK
+            assert len(templates) == 1
+            (template, _), = templates
+            assert template.name == 'login.html'
+
+    @staticmethod
     def test_should_stay_in_login_if_failed(client: FlaskClient) -> None:
         response: TestResponse = client.post(
             '/login',
@@ -82,6 +107,7 @@ class TestLogout:
         response: TestResponse = client.get('/logout')
 
         assert response.location == '/login'
+        assert response.status_code == HTTPStatus.FOUND
 
     @staticmethod
     def test_should_clear_session(client: FlaskClient) -> None:
@@ -92,3 +118,17 @@ class TestLogout:
 
             assert 'user_id' not in session
             assert 'user_name' not in session
+
+    @staticmethod
+    def test_logout_should_render_index_html(app: Flask) -> None:
+        with captured_templates(app) as templates:
+            # login required
+            client: FlaskClient = app.test_client()
+            client.post('/login', data={'email': 'test@email.com', 'password': 'test'})
+
+            response: TestResponse = client.get('/logout')
+
+            assert response.status_code == HTTPStatus.OK
+            assert len(templates) == 1
+            (template, _), = templates
+            assert template.name == 'index.html'
