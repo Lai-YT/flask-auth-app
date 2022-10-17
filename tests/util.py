@@ -1,6 +1,6 @@
 from __future__ import annotations
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Dict, Generator, List, Tuple
+from typing import TYPE_CHECKING, Dict, Generator, List
 
 from flask import message_flashed, template_rendered
 from jinja2 import Template
@@ -10,28 +10,28 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def captured_flash_messages(app: Flask) -> Generator[List[Tuple[str, str]], None, None]:
-    records: List[Tuple[str, str]] = []
+def captured_flash_messages(app: Flask) -> Generator[List[str], None, None]:
+    messages: List[str] = []
 
-    def record(sender: Flask, message: str, category: str, **extra) -> None:
-        records.append((message, category))
+    def record_message(sender: Flask, message: str, category: str, **extra) -> None:
+        messages.append(message)
 
-    message_flashed.connect(sender=app, receiver=record)
+    message_flashed.connect(sender=app, receiver=record_message)
     try:
-        yield records
+        yield messages
     finally:
-        message_flashed.disconnect(sender=app, receiver=record)
+        message_flashed.disconnect(sender=app, receiver=record_message)
 
 
 @contextmanager
-def captured_templates(app: Flask) -> Generator[List[Tuple[Template, Dict[str, Any]]], None, None]:
-    records: List[Tuple[Template, Dict[str, Any]]] = []
+def captured_templates(app: Flask) -> Generator[List[Template], None, None]:
+    templates: List[Template] = []
 
-    def record(sender: Flask, template: Template, context: Dict, **extra) -> None:
-        records.append((template, context))
+    def record_template(sender: Flask, template: Template, context: Dict, **extra) -> None:
+        templates.append(template)
 
-    template_rendered.connect(sender=app, receiver=record)
+    template_rendered.connect(sender=app, receiver=record_template)
     try:
-        yield records
+        yield templates
     finally:
-        template_rendered.disconnect(sender=app, receiver=record)
+        template_rendered.disconnect(sender=app, receiver=record_template)

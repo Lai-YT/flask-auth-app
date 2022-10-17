@@ -29,7 +29,7 @@ class TestRegister:
 
             assert response.status_code == HTTPStatus.OK
             assert len(templates) == 1
-            (template, _), = templates
+            template, = templates
             assert template.name == 'register.html'
 
     @staticmethod
@@ -70,9 +70,8 @@ class TestRegister:
 
             assert response.status_code == HTTPStatus.FOUND
             assert len(messages) == 1
-            (message, category), = messages
+            message, = messages
             assert message == 'Email address already registered.'
-            assert category == 'message'
 
 
 class TestLogin:
@@ -94,7 +93,7 @@ class TestLogin:
 
             assert response.status_code == HTTPStatus.OK
             assert len(templates) == 1
-            (template, _), = templates
+            template, = templates
             assert template.name == 'login.html'
 
     @staticmethod
@@ -119,9 +118,8 @@ class TestLogin:
 
             assert response.status_code == HTTPStatus.FOUND
             assert len(messages) == 1
-            (message, category), = messages
+            message, = messages
             assert message == 'Please check your login details and try again.'
-            assert category == 'message'
 
     @staticmethod
     def test_should_flash_message_if_unregistered_user(app: Flask) -> None:
@@ -135,9 +133,8 @@ class TestLogin:
 
             assert response.status_code == HTTPStatus.FOUND
             assert len(messages) == 1
-            (message, category), = messages
+            message, = messages
             assert message == 'Please check your login details and try again.'
-            assert category == 'message'
 
     @staticmethod
     def test_should_add_user_id_and_name_into_session(client: FlaskClient) -> None:
@@ -184,5 +181,5 @@ class TestLogout:
 
             assert response.status_code == HTTPStatus.OK
             assert len(templates) == 1
-            (template, _), = templates
+            template, = templates
             assert template.name == 'index.html'
