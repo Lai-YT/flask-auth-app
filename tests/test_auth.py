@@ -8,7 +8,7 @@ from sqlalchemy import Select
 
 from auth_app.db import db
 from auth_app.models import User
-from util import captured_templates
+from tests.util import captured_flash_messages, captured_templates
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -49,13 +49,30 @@ class TestRegister:
         assert response.location == '/login'
 
     @staticmethod
-    def test_should_stay_in_register_if_email_has_already_been_used(
+    def test_should_stay_in_register_if_email_already_registered(
             client: FlaskClient, user_data: User) -> None:
         client.post('/register', data=user_data.__dict__)
 
         response: TestResponse = client.post('/register', data=user_data.__dict__)
 
         assert response.location == '/register'
+
+    @staticmethod
+    def test_should_flash_message_if_email_already_registered(app: Flask) -> None:
+        with captured_flash_messages(app) as messages:
+
+            response: TestResponse = app.test_client().post(
+                '/register',
+                data={
+                    'name': 'someone',
+                    'email': 'other@email.com',
+                    'password': 'someonepwd'})
+
+            assert response.status_code == HTTPStatus.FOUND
+            assert len(messages) == 1
+            (message, category), = messages
+            assert message == 'Email address already registered.'
+            assert category == 'message'
 
 
 class TestLogin:
@@ -89,6 +106,31 @@ class TestLogin:
                 'password': 'someone'})
 
         assert response.location == '/login'
+
+    @staticmethod
+    def test_should_flash_message_if_wrong_password(app: Flask) -> None:
+        with captured_flash_messages(app) as messages:
+
+            response: TestResponse = app.test_client().post(
+                '/login', data={'email': 'test@email.com', 'password': 'should_be_test'})
+
+            assert response.status_code == HTTPStatus.FOUND
+            assert len(messages) == 1
+            (message, category), = messages
+            assert message == 'Please check your login details and try again.'
+            assert category == 'message'
+
+    @staticmethod
+    def test_should_flash_message_if_unregistered_user(app: Flask) -> None:
+        with captured_flash_messages(app) as messages:
+            response: TestResponse = app.test_client().post(
+                '/login', data={'email': 'someone@email.com', 'password': 'someone'})
+
+            assert response.status_code == HTTPStatus.FOUND
+            assert len(messages) == 1
+            (message, category), = messages
+            assert message == 'Please check your login details and try again.'
+            assert category == 'message'
 
     @staticmethod
     def test_should_add_user_id_and_name_into_session(client: FlaskClient) -> None:
