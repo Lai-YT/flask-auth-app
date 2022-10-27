@@ -1,8 +1,9 @@
 import functools
 from typing import Callable, Optional
 
-from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   session, url_for)
+from flask import (Blueprint, Flask, flash, g, redirect, render_template,
+                   request, session, url_for)
+from flask_login import login_user, set_login_view
 from sqlalchemy import Select
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -11,6 +12,12 @@ from auth_app.db import db
 from auth_app.models import User
 
 bp = Blueprint('auth', __name__)
+
+
+def init_app(app: Flask) -> None:
+    """Should be called after the LoginManager is set."""
+    with app.app_context():
+        set_login_view(f'{bp.name}.login')
 
 
 @bp.route('/login')
@@ -57,6 +64,7 @@ def login_post():
     session.clear()
     session['user_id'] = user.id
     session['user_name'] = user.name
+    login_user(user)
     return redirect(url_for('main.profile'))
 
 

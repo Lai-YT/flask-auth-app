@@ -152,6 +152,21 @@ class TestLogin:
             assert session['user_id'] == user_id
             assert session['user_name'] == 'test'
 
+    @staticmethod
+    def test_flask_login_should_add_user_id_into_session(client: FlaskClient) -> None:
+        with client:
+
+            client.post(
+                '/login',
+                data={
+                    'email': 'test@email.com',
+                    'password': 'test'})
+
+            stmt: Select = db.select(User.id).where(User.email == 'test@email.com')
+            user_id: int = db.session.execute(stmt).scalars().first()
+            assert session['_user_id'] == str(user_id)
+
+
 
 class TestLogout:
     @staticmethod
