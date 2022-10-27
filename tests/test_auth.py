@@ -105,7 +105,7 @@ class TestLogin:
                 'email': 'someone@email.com',
                 'password': 'someone'})
 
-        assert response.location == '/login'
+        assert response.location == r'/login'
 
     @staticmethod
     def test_should_flash_message_if_wrong_password(app: Flask) -> None:
@@ -138,22 +138,7 @@ class TestLogin:
             assert message == 'Please check your login details and try again.'
 
     @staticmethod
-    def test_should_add_user_id_and_name_into_session(client: FlaskClient) -> None:
-        with client:
-
-            client.post(
-                '/login',
-                data={
-                    'email': 'test@email.com',
-                    'password': 'test'})
-
-            stmt: Select = db.select(User.id).where(User.email == 'test@email.com')
-            user_id: int = db.session.execute(stmt).scalars().first()
-            assert session['user_id'] == user_id
-            assert session['user_name'] == 'test'
-
-    @staticmethod
-    def test_flask_login_should_add_user_id_into_session(client: FlaskClient) -> None:
+    def test_login_should_add_user_id_into_session(client: FlaskClient) -> None:
         with client:
 
             client.post(
@@ -174,7 +159,7 @@ class TestLogout:
         response: TestResponse = client.get('/logout')
 
         assert response.status_code == HTTPStatus.FOUND
-        assert response.location == '/login'
+        assert response.location == r'/login?next=%2Flogout'
 
     @staticmethod
     def test_should_clear_session(client: FlaskClient) -> None:
@@ -183,8 +168,7 @@ class TestLogout:
 
             client.get('/logout')
 
-            assert 'user_id' not in session
-            assert 'user_name' not in session
+            assert '_user_id' not in session
 
     @staticmethod
     def test_should_render_index_html(app: Flask) -> None:
