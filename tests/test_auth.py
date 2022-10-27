@@ -152,7 +152,6 @@ class TestLogin:
             assert session['_user_id'] == str(user_id)
 
 
-
 class TestLogout:
     @staticmethod
     def test_should_be_login_required(client: FlaskClient) -> None:
