@@ -105,7 +105,7 @@ class TestLogin:
                 'email': 'someone@email.com',
                 'password': 'someone'})
 
-        assert response.location == r'/login'
+        assert response.location == '/login'
 
     @staticmethod
     def test_should_flash_message_if_wrong_password(app: Flask) -> None:
@@ -138,7 +138,7 @@ class TestLogin:
             assert message == 'Please check your login details and try again.'
 
     @staticmethod
-    def test_login_should_add_user_id_into_session(client: FlaskClient) -> None:
+    def test_should_add_user_id_into_session(client: FlaskClient) -> None:
         with client:
 
             client.post(
