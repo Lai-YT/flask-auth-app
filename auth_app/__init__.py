@@ -2,10 +2,11 @@ from secrets import token_hex
 from typing import Mapping, Optional
 
 from flask import Flask
+from flask_login import LoginManager
 
 from auth_app import auth, main
 from auth_app.db import db
-from auth_app.models import create_db_command
+from auth_app.models import User, create_db_command
 
 
 def create_app(test_config: Optional[Mapping] = None) -> Flask:
@@ -26,5 +27,14 @@ def create_app(test_config: Optional[Mapping] = None) -> Flask:
     app.cli.add_command(create_db_command)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    auth.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id: str) -> Optional[User]:
+        return db.session.get(User, user_id)
 
     return app

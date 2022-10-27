@@ -25,7 +25,7 @@ def test_profile_should_be_login_required(client: FlaskClient) -> None:
     response: TestResponse = client.get('/profile')
 
     assert response.status_code == HTTPStatus.FOUND
-    assert response.location == '/login'
+    assert response.location == r'/login?next=%2Fprofile'
 
 
 def test_profile_should_render_profile_html(app: Flask) -> None:

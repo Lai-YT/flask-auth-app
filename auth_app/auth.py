@@ -1,8 +1,8 @@
-import functools
-from typing import Callable, Optional
+from typing import Optional
 
-from flask import (Blueprint, flash, g, redirect, render_template, request,
-                   session, url_for)
+from flask import (Blueprint, Flask, flash, redirect, render_template, request,
+                   url_for)
+from flask_login import login_required, login_user, logout_user, set_login_view
 from sqlalchemy import Select
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -11,6 +11,12 @@ from auth_app.db import db
 from auth_app.models import User
 
 bp = Blueprint('auth', __name__)
+
+
+def init_app(app: Flask) -> None:
+    """Should be called after the LoginManager is set."""
+    with app.app_context():
+        set_login_view(f'{bp.name}.login')
 
 
 @bp.route('/login')
@@ -54,33 +60,12 @@ def login_post():
     if user is None or not check_password_hash(user.password, password):
         flash('Please check your login details and try again.')
         return redirect(url_for('auth.login'))
-    session.clear()
-    session['user_id'] = user.id
-    session['user_name'] = user.name
+    login_user(user)
     return redirect(url_for('main.profile'))
-
-
-@bp.before_app_request
-def load_logged_in_user() -> None:
-    try:
-        user_id: int = session['user_id']
-        stmt: Select = db.select(User).where(User.id == user_id)
-        g.user = db.session.execute(stmt).scalars().one()
-    except KeyError:
-        g.user = None
-
-
-def login_required(view: Callable):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-        return view(**kwargs)
-    return wrapped_view
 
 
 @bp.route('/logout')
 @login_required
 def logout():
-    session.clear()
+    logout_user()
     return render_template('index.html')

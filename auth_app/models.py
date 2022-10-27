@@ -1,11 +1,12 @@
 import click
 from flask import current_app
+from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column
 
 from auth_app.db import db
 
 
-class User(db.Model):  # type: ignore
+class User(db.Model, UserMixin):  # type: ignore
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str]
