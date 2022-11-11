@@ -1,9 +1,10 @@
 from __future__ import annotations
 from http import HTTPStatus
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, no_type_check
 
 import pytest
 from flask import session
+from flask_login import current_user, login_remembered
 from sqlalchemy import Select
 
 from auth_app.db import db
@@ -150,6 +151,26 @@ class TestLogin:
             stmt: Select = db.select(User.id).where(User.email == 'test@email.com')
             user_id: int = db.session.execute(stmt).scalars().first()
             assert session['_user_id'] == str(user_id)
+
+    def test_should_keep_user_authenticated_if_remember(
+            self, app: Flask, client: FlaskClient) -> None:
+        @app.route('/username')
+        def username():
+            if current_user.is_authenticated:
+                return current_user.name
+            return "anonymous"
+
+        client.post(
+            '/login',
+            data={
+                'email': 'test@email.com',
+                'password': 'test',
+                'remember': 'any-value'})
+        with client.session_transaction() as session:
+            session.clear()
+
+        response: TestResponse = client.get('/username')
+        assert response.data == b'test'
 
 
 class TestLogout:
