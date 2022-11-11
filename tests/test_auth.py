@@ -1,10 +1,10 @@
 from __future__ import annotations
 from http import HTTPStatus
-from typing import TYPE_CHECKING, no_type_check
+from typing import TYPE_CHECKING
 
 import pytest
 from flask import session
-from flask_login import current_user, login_remembered
+from flask_login import current_user
 from sqlalchemy import Select
 
 from auth_app.db import db
