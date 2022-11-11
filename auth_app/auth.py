@@ -60,7 +60,9 @@ def login_post():
     if user is None or not check_password_hash(user.password, password):
         flash('Please check your login details and try again.')
         return redirect(url_for('auth.login'))
-    login_user(user)
+
+    remember_me: bool = request.form.get('remember') is not None
+    login_user(user, remember=remember_me)
     return redirect(url_for('main.profile'))
 
 
